@@ -1,8 +1,11 @@
 package com.example.security.securityProject.controllers;
 
+import com.example.security.securityProject.entity.Authority;
+import com.example.security.securityProject.entity.Users;
 import com.example.security.securityProject.jwt.AuthEntryPointJwt;
 import com.example.security.securityProject.jwt.JwtAuthTokenFilter;
 import com.example.security.securityProject.jwt.jwtUtils;
+import com.example.security.securityProject.repository.UsersRepository;
 import com.example.security.securityProject.securityModels.loginRequest;
 import com.example.security.securityProject.securityModels.loginResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -33,6 +37,8 @@ public class securityControllers {
     private final JwtAuthTokenFilter jwtAuthTokenFilter;
     private final AuthEntryPointJwt authEntryPointJwt;
     private final AuthenticationManager authenticationManager;
+    private final UsersRepository usersRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping(value = "hello")
     public String getGreeting(){
@@ -81,5 +87,29 @@ public class securityControllers {
         roles(roles).build();
 
         return new ResponseEntity<>(loginRes, HttpStatus.OK);
+    }
+
+    // New endpoint
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody loginRequest request) {
+        if (usersRepository.findById(request.getUsername()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", "Username already exists"));
+        }
+
+        Users newUser = Users.builder()
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .enabled(true)
+                .build();
+
+        newUser.addAuthority(Authority.builder()
+                .authority("ROLE_USER")
+                .build());
+
+        usersRepository.save(newUser);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "User registered successfully"));
     }
 }

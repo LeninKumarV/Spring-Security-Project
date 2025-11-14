@@ -68,6 +68,9 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
                         // Set authentication to Spring Security context
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
+                    else{
+                        log.info("Authentication Failed (or) invalid token");
+                    }
                 }
                 else{
                     log.info("the user is not present in the token");
