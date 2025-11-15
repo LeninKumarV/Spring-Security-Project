@@ -80,7 +80,6 @@ public class WebSecurity {
         return userDetailsService;
     }
 
-    // Optional (explicit provider registration)
     @Bean
     public AuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
