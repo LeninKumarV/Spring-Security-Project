@@ -7,20 +7,19 @@ DROP TABLE IF EXISTS authorities CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 
 CREATE TABLE users (
-    userId UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(500) NOT NULL,
-    enabled BOOLEAN NOT NULL
+                       userId UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                       username VARCHAR(50) NOT NULL UNIQUE,
+                       password VARCHAR(500) NOT NULL,
+                       enabled BOOLEAN NOT NULL
 );
 
 CREATE TABLE authorities (
-    authId UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    username VARCHAR(50) NOT NULL,
-    authority VARCHAR(50) NOT NULL,
-    CONSTRAINT fk_authorities_users FOREIGN KEY (username)
-        REFERENCES users(username)
+                             authId UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                             userid UUID NOT NULL,
+                             authority VARCHAR(50) NOT NULL,
+                             CONSTRAINT fk_authorities_users
+                                 FOREIGN KEY (userid) REFERENCES users(userId),
+                             UNIQUE (userid, authority)
 );
 
-CREATE UNIQUE INDEX ix_auth_username
-    ON authorities (username, authority);
 

@@ -92,7 +92,8 @@ public class securityControllers {
     // New endpoint
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody loginRequest request) {
-        if (usersRepository.findById(request.getUsername()).isPresent()) {
+
+        if (usersRepository.existsByUsername((request.getUsername()))) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("message", "Username already exists"));
         }
@@ -103,13 +104,16 @@ public class securityControllers {
                 .enabled(true)
                 .build();
 
-        newUser.addAuthority(Authority.builder()
+        Authority roleUser = Authority.builder()
                 .authority("ROLE_USER")
-                .build());
+                .build();
+
+        newUser.addAuthority(roleUser);
 
         usersRepository.save(newUser);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("message", "User registered successfully"));
     }
+
 }

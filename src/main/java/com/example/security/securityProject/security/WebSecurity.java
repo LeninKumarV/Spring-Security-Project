@@ -98,7 +98,7 @@ public class WebSecurity {
     @Bean
     public CommandLineRunner initData(UsersRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            if (userRepository.findById("user1").isEmpty()) {
+            if (userRepository.findByUsername("user1").isEmpty()) {
                 Users user1 = Users.builder()
                         .username("user1")
                         .password(passwordEncoder.encode("password1"))
@@ -108,7 +108,7 @@ public class WebSecurity {
                 userRepository.save(user1);
             }
 
-            if (userRepository.findById("admin").isEmpty()) {
+            if (userRepository.findByUsername("admin").isEmpty()) {
                 Users admin = Users.builder()
                         .username("admin")
                         .password(passwordEncoder.encode("adminPass"))

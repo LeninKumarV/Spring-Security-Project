@@ -8,9 +8,10 @@ import java.util.UUID;
 @Entity
 @Table(
         name = "authorities",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"username", "authority"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"userid", "authority"})
 )
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -18,16 +19,17 @@ public class Authority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(columnDefinition = "UUID", updatable = false, nullable = false)
+    @Column(name = "authid", columnDefinition = "UUID")
     private UUID authId;
 
     @Column(length = 50, nullable = false)
     private String authority;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "username", nullable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    @JoinColumn(
+            name = "userid",
+            referencedColumnName = "userid",
+            nullable = false
+    )
     private Users user;
 }
-
