@@ -1,5 +1,6 @@
 package com.example.security.securityProject.controllers;
 
+import com.example.security.securityProject.customAnnotations.AdminOnly;
 import com.example.security.securityProject.entity.Authority;
 import com.example.security.securityProject.entity.Users;
 import com.example.security.securityProject.jwt.AuthEntryPointJwt;
@@ -57,6 +58,11 @@ public class securityControllers {
         return "Hello Admin!";
     }
 
+    @AdminOnly
+    @GetMapping("author")
+    public String getAdminsDetailsCheck(){
+        return "Hello Admin / Super Admin!";
+    }
 
     @PostMapping(value =  "/login")
     public ResponseEntity<?> authenticateUser(@RequestBody loginRequest loginRequest) {
@@ -91,6 +97,7 @@ public class securityControllers {
 
     // New endpoint
     @PostMapping("/register")
+    @AdminOnly
     public ResponseEntity<?> registerUser(@RequestBody loginRequest request) {
 
         if (usersRepository.existsByUsername((request.getUsername()))) {
@@ -104,12 +111,13 @@ public class securityControllers {
                 .enabled(true)
                 .build();
 
-        Authority roleUser = Authority.builder()
-                .authority("ROLE_USER")
-                .build();
+        for (String role : request.getRoles()) {
+            Authority roleUser = Authority.builder()
+                    .authority("ROLE_" + role)
+                    .build();
 
-        newUser.addAuthority(roleUser);
-
+            newUser.addAuthority(roleUser);
+        }
         usersRepository.save(newUser);
 
         return ResponseEntity.status(HttpStatus.CREATED)
