@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -124,4 +126,21 @@ public class securityControllers {
                 .body(Map.of("message", "User registered successfully"));
     }
 
+    //checkout current login profiles
+    @GetMapping(value = "/profiles")
+    public ResponseEntity<?> loginUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        return ResponseEntity.ok(
+                loginResponse.builder()
+                        .username(userDetails.getUsername())
+                        .roles(
+                                userDetails.getAuthorities()
+                                        .stream()
+                                        .map(GrantedAuthority::getAuthority).toList()
+                        )
+                        .build()
+        );
+    }
 }
